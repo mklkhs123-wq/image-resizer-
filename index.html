@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pro Image Tool Suite</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:linear-gradient(135deg,#141e30,#243b55);
+    color:#fff;
+}
+
+/* layout */
+.header{
+    text-align:center;
+    padding:15px;
+    background:rgba(0,0,0,0.4);
+    font-size:20px;
+    font-weight:bold;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+/* box */
+.box{
+    flex:1;
+    min-width:300px;
+    background:rgba(255,255,255,0.08);
+    padding:15px;
+    border-radius:15px;
+    box-shadow:0 0 20px rgba(0,0,0,0.3);
+}
+
+/* upload */
+.upload{
+    border:2px dashed #fff;
+    padding:25px;
+    text-align:center;
+    border-radius:12px;
+    cursor:pointer;
+}
+
+/* images */
+img{
+    width:100%;
+    margin-top:10px;
+    border-radius:10px;
+    display:none;
+}
+
+/* controls */
+input,select{
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    border-radius:8px;
+    border:none;
+}
+
+/* buttons */
+button{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    color:#fff;
+}
+
+.btn1{background:linear-gradient(45deg,#ff416c,#ff4b2b);}
+.btn2{background:linear-gradient(45deg,#00c6ff,#0072ff);}
+.btn3{background:linear-gradient(45deg,#00ff99,#00c6ff);}
+
+/* ad box */
+.ad{
+    width:100%;
+    padding:20px;
+    text-align:center;
+    margin-top:20px;
+    background:rgba(255,255,255,0.1);
+    border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">🔥 PRO IMAGE TOOL SUITE</div>
+
+<div class="container">
+
+<!-- LEFT -->
+<div class="box">
+    <div class="upload" onclick="file.click()">📤 Upload Image</div>
+    <input type="file" id="file" accept="image/*" hidden>
+
+    <img id="preview">
+
+    <p id="info"></p>
+
+    <label>Resize %</label>
+    <input type="range" id="resize" min="10" max="200" value="100">
+
+    <label>Compression (Quality)</label>
+    <input type="range" id="quality" min="10" max="100" value="80">
+
+    <label>Format</label>
+    <select id="format">
+        <option value="image/png">PNG</option>
+        <option value="image/jpeg">JPG</option>
+        <option value="image/webp">WEBP</option>
+    </select>
+
+    <button class="btn1" onclick="processImage()">🚀 Process Image</button>
+    <button class="btn2" id="download" style="display:none" onclick="downloadImg()">⬇ Download</button>
+</div>
+
+<!-- RIGHT -->
+<div class="box">
+    <h3>Before / After</h3>
+    <img id="before">
+    <img id="after">
+
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <!-- AD SLOT -->
+    <div class="ad">
+        🔥 Ad Slot (Google AdSense Here)
+    </div>
+</div>
+
+</div>
+
+<script>
+
+let img = new Image();
+let canvas = document.getElementById("canvas");
+let ctx = canvas.getContext("2d");
+
+const file = document.getElementById("file");
+const preview = document.getElementById("preview");
+const before = document.getElementById("before");
+const after = document.getElementById("after");
+const info = document.getElementById("info");
+
+file.onchange = function(e){
+
+    let f = e.target.files[0];
+    if(!f) return;
+
+    img = new Image();
+    img.src = URL.createObjectURL(f);
+
+    img.onload = function(){
+        preview.src = img.src;
+        preview.style.display = "block";
+
+        before.src = img.src;
+        before.style.display = "block";
+    }
+
+    let kb = (f.size/1024).toFixed(2);
+    info.innerHTML = `📁 Original Size: ${kb} KB`;
+};
+
+function processImage(){
+
+    let resize = document.getElementById("resize").value / 100;
+    let quality = document.getElementById("quality").value / 100;
+    let format = document.getElementById("format").value;
+
+    canvas.width = img.width * resize;
+    canvas.height = img.height * resize;
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+
+    let output = canvas.toDataURL(format, quality);
+
+    after.src = output;
+    after.style.display = "block";
+
+    document.getElementById("download").style.display = "block";
+}
+
+function downloadImg(){
+
+    let a = document.createElement("a");
+    a.download = "pro-image." + document.getElementById("format").value.split("/")[1];
+    a.href = after.src;
+    a.click();
+}
+
+</script>
+
+</body>
+</html>
